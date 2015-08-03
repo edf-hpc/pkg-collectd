@@ -1,0 +1,242 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## slurmctld-plugin.dpatch by Rémi Palancher <remi@rezib.org>
+##
+## DP: plugin: slurmctld plugin
+
+@DPATCH@
+
+diff --git a/configure.ac b/configure.ac
+index e1b477a..c00a6e8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3877,6 +3877,66 @@ fi
+ AM_CONDITIONAL(BUILD_WITH_LIBSIGROK, test "x$with_libsigrok" = "xyes")
+ # }}}
+ 
++# --with-libslurm {{{
++with_libslurm_cflags=""
++with_libslurm_ldflags=""
++AC_ARG_WITH(libslurm, [AS_HELP_STRING([--with-libslurm@<:@=PREFIX@:>@], [Path to libslurm.])],
++[
++	if test "x$withval" = "xno"
++	then
++		with_libslurm="no"
++	else
++		with_libslurm="yes"
++		if test "x$withval" != "xyes"
++		then
++			with_libslurm_cflags="-I$withval/include"
++			with_libslurm_ldflags="-L$withval/lib"
++		fi
++	fi
++],[with_libslurm="yes"])
++
++# libslurm headers
++if test "x$with_libslurm" = "xyes"
++then
++	SAVE_CPPFLAGS="$CPPFLAGS"
++	CPPFLAGS="$CPPFLAGS $with_libslurm_cflags"
++
++	AC_CHECK_HEADERS(slurm/slurm.h,
++                         [],
++                         [with_libslurm="no (slurm/slurm.h not found)"])
++
++	CPPFLAGS="$SAVE_CPPFLAGS"
++fi
++
++# libslurm library
++if test "x$with_libslurm" = "xyes"
++then
++	SAVE_CPPFLAGS="$CPPFLAGS"
++	SAVE_LDFLAGS="$LDFLAGS"
++	CPPFLAGS="$CPPFLAGS $with_libslurm_cflags"
++	LDFLAGS="$LDFLAGS $with_libslurm_ldflags"
++
++	AC_CHECK_LIB(slurm, slurm_load_jobs,
++	[
++		AC_DEFINE(HAVE_LIBSLURM, 1, [Define to 1 if you have the slurm library (-lslurm).])
++	],
++	[with_libslurm="no (libslurm not found)"])
++
++	CPPFLAGS="$SAVE_CPPFLAGS"
++	LDFLAGS="$SAVE_LDFLAGS"
++fi
++if test "x$with_libslurm" = "xyes"
++then
++	BUILD_WITH_LIBSLURM_CFLAGS="$with_libslurm_cflags"
++	BUILD_WITH_LIBSLURM_LDFLAGS="$with_libslurm_ldflags"
++	BUILD_WITH_LIBSLURM_LIBS="-lslurm"
++	AC_SUBST(BUILD_WITH_LIBSLURM_CFLAGS)
++	AC_SUBST(BUILD_WITH_LIBSLURM_LDFLAGS)
++	AC_SUBST(BUILD_WITH_LIBSLURM_LIBS)
++fi
++AM_CONDITIONAL(BUILD_WITH_LIBSLURM, test "x$with_libslurm" = "xyes")
++# }}}
++
+ # --with-libstatgrab {{{
+ with_libstatgrab_cflags=""
+ with_libstatgrab_ldflags=""
+@@ -5209,6 +5269,7 @@ AC_PLUGIN([rrdtool],     [$with_librrd],       [RRDTool output plugin])
+ AC_PLUGIN([sensors],     [$with_libsensors],   [lm_sensors statistics])
+ AC_PLUGIN([serial],      [$plugin_serial],     [serial port traffic])
+ AC_PLUGIN([sigrok],      [$with_libsigrok],    [sigrok acquisition sources])
++AC_PLUGIN([slurmctld],   [$with_libslurm],     [Slurmctld jobs statistics])
+ AC_PLUGIN([slurmd],      [yes],                [Slurmd jobs statistics])
+ AC_PLUGIN([snmp],        [$with_libnetsnmp],   [SNMP querying plugin])
+ AC_PLUGIN([statsd],      [yes],                [StatsD plugin])
+@@ -5447,6 +5508,7 @@ Configuration:
+     librrd  . . . . . . . $with_librrd
+     libsensors  . . . . . $with_libsensors
+     libsigrok   . . . . . $with_libsigrok
++    libslurm  . . . . . . $with_libslurm
+     libstatgrab . . . . . $with_libstatgrab
+     libtokyotyrant  . . . $with_libtokyotyrant
+     libupsclient  . . . . $with_libupsclient
+@@ -5554,6 +5616,7 @@ Configuration:
+     sensors . . . . . . . $enable_sensors
+     serial  . . . . . . . $enable_serial
+     sigrok  . . . . . . . $enable_sigrok
++    slurmctld . . . . . . $enable_slurmctld
+     slurmd  . . . . . . . $enable_slurmd
+     snmp  . . . . . . . . $enable_snmp
+     statsd  . . . . . . . $enable_statsd
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 076f029..0b2a511 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -1072,6 +1072,16 @@ sigrok_la_LDFLAGS = $(PLUGIN_LDFLAGS) $(BUILD_WITH_LIBSIGROK_LDFLAGS)
+ collectd_DEPENDENCIES += sigrok.la
+ endif
+ 
++if BUILD_PLUGIN_SLURMCTLD
++pkglib_LTLIBRARIES += slurmctld.la
++slurmctld_la_SOURCES = slurmctld.c
++slurmctld_la_CFLAGS = $(AM_CFLAGS) $(BUILD_WITH_LIBSLURM_CFLAGS)
++slurmctld_la_LDFLAGS = -module -avoid-version $(BUILD_WITH_LIBSLURM_LDFLAGS)
++slurmctld_la_LIBADD = $(BUILD_WITH_LIBSLURM_LIBS)
++collectd_LDADD += "-dlopen" slurmctld.la
++collectd_DEPENDENCIES += slurmctld.la
++endif
++
+ if BUILD_PLUGIN_SLURMD
+ pkglib_LTLIBRARIES += slurmd.la
+ slurmd_la_SOURCES = slurmd.c
+diff --git a/src/collectd.conf.in b/src/collectd.conf.in
+index f466db2..e3ef284 100644
+--- a/src/collectd.conf.in
++++ b/src/collectd.conf.in
+@@ -156,6 +156,9 @@
+ #@BUILD_PLUGIN_SENSORS_TRUE@LoadPlugin sensors
+ #@BUILD_PLUGIN_SERIAL_TRUE@LoadPlugin serial
+ #@BUILD_PLUGIN_SIGROK_TRUE@LoadPlugin sigrok
++#@BUILD_PLUGIN_SLURMCTLD_TRUE@<LoadPlugin slurmctld>
++#@BUILD_PLUGIN_SLURMCTLD_TRUE@    Globals true
++#@BUILD_PLUGIN_SLURMCTLD_TRUE@</LoadPlugin>
+ #@BUILD_PLUGIN_SLURMD_TRUE@LoadPlugin slurmd
+ #@BUILD_PLUGIN_SNMP_TRUE@LoadPlugin snmp
+ #@BUILD_PLUGIN_STATSD_TRUE@LoadPlugin statsd
+diff --git a/src/slurmctld.c b/src/slurmctld.c
+new file mode 100644
+index 0000000..774dd36
+--- /dev/null
++++ b/src/slurmctld.c
+@@ -0,0 +1,99 @@
++/**
++ * collectd - src/slurmctld.c
++ * Copyright (C) 2015       Rémi Palancher
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; only version 2 of the License is applicable.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, write to the Free Software Foundation, Inc.,
++ * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
++ *
++ * Authors:
++ *   Rémi Palancher <remi at rezib.org>
++ **/
++
++#include "collectd.h"
++#include "common.h"
++#include "plugin.h"
++#include "configfile.h"
++
++#include <slurm/slurm.h>
++
++/*
++ * Submit a gauge related to a job number.
++ */
++static void slurmctld_submit_gauge (long unsigned int job_number,
++                          char *type_instance,
++                          gauge_t value)
++{
++  value_list_t vl = VALUE_LIST_INIT;
++  value_t values[1];
++  values[0].gauge = value;
++
++  sstrncpy (vl.host, hostname_g, sizeof (vl.host));
++  sstrncpy (vl.plugin, "slurmctld", sizeof (vl.plugin));
++  ssnprintf(vl.plugin_instance, sizeof(vl.plugin_instance), "job_%lu", job_number);
++  sstrncpy (vl.type, "count", sizeof(vl.type));
++  sstrncpy (vl.type_instance, type_instance, sizeof(vl.type_instance));
++
++  vl.values = values;
++  vl.values_len = 1;
++
++  plugin_dispatch_values (&vl);
++} /* void slurmctld_submit_gauge */
++
++/*
++ * Submit all gauges for a slurm job.
++ */
++static void slurmctld_report_job_info (job_info_t *job)
++{
++  slurmctld_submit_gauge(job->job_id, "nodes", (gauge_t) job->num_nodes);
++  slurmctld_submit_gauge(job->job_id, "cpus", (gauge_t) job->num_cpus);
++} /* void slurmctld_report_job_info */
++
++/*
++ * Send RPC to slurmctld in order to load the list of jobs. Then, it iterates
++ * over the list of currently running jobs to submit their metrics.
++ * Returns 0 on success, -1 on error.
++ */
++static int slurmctld_read (void)
++{
++  job_info_msg_t *job_info_msg = NULL;
++  job_info_t *job = NULL;
++  int i;
++  int errcode = 0;
++
++  errcode = slurm_load_jobs((time_t) NULL, &job_info_msg, 0);
++
++  if (errcode) {
++    ERROR("slurmctld plugin: error during slurm_load_jobs(): %d\n", errcode);
++    slurm_free_job_info_msg(job_info_msg);
++    return errcode;
++  }
++
++  for (i=0; i<job_info_msg->record_count; i++) {
++    job = &(job_info_msg->job_array[i]);
++
++    if ((job->job_state & JOB_STATE_BASE) == JOB_RUNNING)
++      slurmctld_report_job_info(job);
++    else
++      DEBUG("slurmctld plugin: excluding job id: %" PRIu32 " because not "
++            "running: %" PRIu16 "",
++            job->job_id,
++            job->job_state);
++  }
++  slurm_free_job_info_msg(job_info_msg);
++  return (0);
++} /* int slurmctld_read */
++
++void module_register (void)
++{
++  plugin_register_read("slurmctld", slurmctld_read);
++} /* void module_register */
