@@ -1,3 +1,15 @@
+collectd (5.4.1-6+c9+1) calibre9; urgency=medium
+
+  * Non-maintainer upload.
+  * Add new slurmd plugin patch
+  * Add new slurmctld plugin patch
+  * Patch to delay first read to next interval
+  * Patch to fix version-gen.sh script with GBP repo
+  * New patch to add count type in types.db
+  * Add examples of LoadPlugin for slurm related plugins
+
+ -- Rémi Palancher <remi-externe.palancher@edf.fr>  Mon, 03 Aug 2015 11:41:06 +0200
+
 collectd (5.4.1-6) unstable; urgency=medium
 
   * debian/patches:
