@@ -14,3 +14,4 @@ bts770693_timestamps.dpatch
 bts770694_loglevel.dpatch
 slurmd-plugin.dpatch
 slurmctld-plugin.dpatch
+delay-first-read.dpatch
