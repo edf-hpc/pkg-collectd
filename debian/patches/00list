@@ -15,3 +15,4 @@ bts770694_loglevel.dpatch
 slurmd-plugin.dpatch
 slurmctld-plugin.dpatch
 delay-first-read.dpatch
+fix-version-gen.dpatch

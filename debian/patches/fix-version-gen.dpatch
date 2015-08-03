@@ -1,0 +1,18 @@
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## fix-version-gen.dpatch by Rémi Palancher <remi@rezib.org>
+##
+## DP: fix version-gen.sh script to handle GBP repo
+
+@DPATCH@
+
+--- a/version-gen.sh	2015-08-03 17:33:01.708000000 +0200
++++ b/version-gen.sh	2015-08-03 17:34:40.704000000 +0200
+@@ -2,7 +2,7 @@
+ 
+ DEFAULT_VERSION="5.4.1.git"
+ 
+-VERSION="`git describe 2> /dev/null | sed -e 's/^collectd-//'`"
++VERSION="`git describe 2> /dev/null | sed -e 's/^\(collectd-\|debian\/\)//'`"
+ 
+ if test -z "$VERSION"; then
+ 	VERSION="$DEFAULT_VERSION"
