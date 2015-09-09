@@ -135,6 +135,32 @@ index f466db2..e3ef284 100644
  #@BUILD_PLUGIN_SLURMD_TRUE@LoadPlugin slurmd
  #@BUILD_PLUGIN_SNMP_TRUE@LoadPlugin snmp
  #@BUILD_PLUGIN_STATSD_TRUE@LoadPlugin statsd
+diff --git a/src/collectd.conf.pod b/src/collectd.conf.pod
+index 81c01f1..e8733db 100644
+--- a/src/collectd.conf.pod
++++ b/src/collectd.conf.pod
+@@ -5293,6 +5293,21 @@ boot.
+ 
+ =back
+ 
++=head2 Plugin C<slurmctld>
++
++The I<slurmctld plugin> uses I<libslurm> to retrieve information from slurmctld
++daemon of Slurm HPC workload manager. It collectd the number of nodes and CPU
++allocated to jobs.
++
++This plugin must be loaded with B<Globals> parameter sets to B<true> since the
++slurm library also loads various plugins with C<dlopen()>.
++
++B<Synopsis:>
++
++  <LoadPlugin slurmctld>
++      Globals true
++  </LoadPlugin>
++
+ =head2 Plugin C<snmp>
+ 
+ Since the configuration of the C<snmp plugin> is a little more complicated than
 diff --git a/src/slurmctld.c b/src/slurmctld.c
 new file mode 100644
 index 0000000..774dd36
