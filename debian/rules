@@ -182,6 +182,7 @@ config.status: configure $(DPATCH_STAMPFN)
 		> debian/pkgconfig/OpenIPMIpthread.pc
 	
 	aclocal
+	autoconf
 	automake
 	PKG_CONFIG_PATH="$(CURDIR)/debian/pkgconfig:$$PKG_CONFIG_PATH" \
 	./configure $(confflags) CPPFLAGS="$(CPPFLAGS)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" \
