@@ -1,3 +1,11 @@
+collectd (5.4.1-6+c9+3) calibre9; urgency=medium
+
+  * Override lintian error about dpatch
+  * Add missing Build-dep on automake and libtool
+  * Add autoconf to d/rules
+
+ -- Rémi Palancher <remi-externe.palancher@edf.fr>  Mon, 21 Sep 2015 16:13:25 +0200
+
 collectd (5.4.1-6+c9+2) calibre9; urgency=medium
 
   * Update delay-first-read patch
