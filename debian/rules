@@ -105,6 +105,85 @@ confflags += --disable-xmms
 # libkstat is required for the xfs_arc plugin.
 confflags += --disable-zfs-arc
 
+# disable many plugins on calibre
+confflags += \
+  --disable-amqp \
+  --disable-apache \
+  --disable-apcups \
+  --disable-apple_sensors \
+  --disable-aquaero \
+  --disable-ascent \
+  --disable-battery \
+  --disable-bind \
+  --disable-conntrack \
+  --disable-curl \
+  --disable-curl_json \
+  --disable-curl_xml \
+  --disable-dbi \
+  --disable-dns \
+  --disable-email \
+  --disable-filecount \
+  --disable-gmond \
+  --disable-hddtemp \
+  --disable-ipmi \
+  --disable-iptables \
+  --disable-ipvs \
+  --disable-java \
+  --disable-libvirt \
+  --disable-lvm \
+  --disable-madwifi \
+  --disable-mbmon \
+  --disable-md \
+  --disable-memcachec \
+  --disable-memcached \
+  --disable-mic \
+  --disable-modbus \
+  --disable-multimeter \
+  --disable-mysql \
+  --disable-netapp \
+  --disable-nginx \
+  --disable-notify_desktop \
+  --disable-notify_email \
+  --disable-ntpd \
+  --disable-numa \
+  --disable-nut \
+  --disable-olsrd \
+  --disable-onewire \
+  --disable-openvpn \
+  --disable-oracle \
+  --disable-perl \
+  --disable-pf \
+  --disable-pinba \
+  --disable-ping \
+  --disable-postgresql \
+  --disable-powerdns \
+  --disable-protocols \
+  --disable-python \
+  --disable-redis \
+  --disable-routeros \
+  --disable-rrdcached \
+  --disable-rrdtool \
+  --disable-sensors \
+  --disable-serial \
+  --disable-sigrok \
+  --disable-snmp \
+  --disable-statsd \
+  --disable-table \
+  --disable-tail \
+  --disable-tail_csv \
+  --disable-tape \
+  --disable-tcpconns \
+  --disable-teamspeak2 \
+  --disable-ted \
+  --disable-tokyotyrant \
+  --disable-varnish \
+  --disable-vserver \
+  --disable-wireless \
+  --disable-write_http \
+  --disable-write_mongodb \
+  --disable-write_redis \
+  --disable-write_riemann
+
 # These plugins are Linux-specific.
 ifneq (,$(filter kfreebsd-i386 kfreebsd-amd64, $(DEB_BUILD_ARCH)))
 	confflags += \
@@ -176,10 +255,10 @@ config.status: configure $(DPATCH_STAMPFN)
 		fi; done )
 	
 	# This is a work-around for #474087 (broken openipmi .pc files).
-	mkdir debian/pkgconfig
-	sed -re 's/^(Requires:.*) pthread(.*)$$/\1\2/' \
-		/usr/lib/pkgconfig/OpenIPMIpthread.pc \
-		> debian/pkgconfig/OpenIPMIpthread.pc
+	#mkdir debian/pkgconfig
+	#sed -re 's/^(Requires:.*) pthread(.*)$$/\1\2/' \
+	#	/usr/lib/pkgconfig/OpenIPMIpthread.pc \
+	#	> debian/pkgconfig/OpenIPMIpthread.pc
 	
 	aclocal
 	autoconf
