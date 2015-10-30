@@ -1,3 +1,9 @@
+collectd (5.4.1-6+c9+4) calibre9; urgency=low
+
+  * Remove many opts Build-deps in order to remove many deps then
+
+ -- Rémi Palancher <remi-externe.palancher@edf.fr>  Wed, 23 Sep 2015 10:26:43 +0200
+
 collectd (5.4.1-6+c9+3) calibre9; urgency=medium
 
   * Override lintian error about dpatch
