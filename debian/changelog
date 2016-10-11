@@ -1,3 +1,9 @@
+collectd (5.4.1-6calibre9+6) calibre9; urgency=medium
+
+  * Rebuild with libslurm30.
+
+ -- Rémi Palancher <remi-externe.palancher@edf.fr>  Tue, 11 Oct 2016 16:16:26 +0200
+
 collectd (5.4.1-6calibre9+5) calibre9; urgency=medium
 
   * Rebuild with new versioning convention.
