@@ -1,3 +1,9 @@
+collectd (5.4.1-6calibre9+8) calibre9; urgency=medium
+
+  * Rebuild with libslurm32.
+
+ -- Mehdi Dogguy <mehdi.dogguy@edf.fr>  Tue, 16 Jan 2018 10:46:40 +0100
+
 collectd (5.4.1-6calibre9+7) calibre9; urgency=medium
 
   * Rebuild with libslurm31.
