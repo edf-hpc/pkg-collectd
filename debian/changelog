@@ -1,3 +1,9 @@
+collectd (5.4.1-6calibre9+9) calibre9; urgency=medium
+
+  * slurmd: support cgroups in cpuset/slurm_NODENAME
+
+ -- Thomas HAMEL <thomas-externe.hamel@edf.fr>  Mon, 19 Feb 2018 11:53:13 +0100
+
 collectd (5.4.1-6calibre9+8) calibre9; urgency=medium
 
   * Rebuild with libslurm32.
