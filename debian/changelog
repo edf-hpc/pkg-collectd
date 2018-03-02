@@ -1,3 +1,9 @@
+collectd (5.4.1-6calibre9+10) calibre9; urgency=medium
+
+  * Fix default cgroup path for slurmd plugin
+
+ -- Rémi Palancher <remi-externe.palancher@edf.fr>  Fri, 02 Mar 2018 15:46:40 +0100
+
 collectd (5.4.1-6calibre9+9) calibre9; urgency=medium
 
   * slurmd: support cgroups in cpuset/slurm_NODENAME
