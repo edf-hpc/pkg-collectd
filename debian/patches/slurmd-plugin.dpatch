@@ -4,12 +4,10 @@
 ## DP: plugin: slurmd plugin
 
 @DPATCH@
-
-diff --git a/configure.ac b/configure.ac
-index 6ee6e9a..e1b477a 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -5209,6 +5209,7 @@ AC_PLUGIN([rrdtool],     [$with_librrd],       [RRDTool output plugin])
+diff -urNad '--exclude=CVS' '--exclude=.svn' '--exclude=.git' '--exclude=.arch' '--exclude=.hg' '--exclude=_darcs' '--exclude=.bzr' git_edf-hpc_pkg-collectd~/configure.ac git_edf-hpc_pkg-collectd/configure.ac
+--- git_edf-hpc_pkg-collectd~/configure.ac	2018-03-15 14:38:47.000000000 +0100
++++ git_edf-hpc_pkg-collectd/configure.ac	2018-03-15 15:18:52.000000000 +0100
+@@ -5209,6 +5209,7 @@
  AC_PLUGIN([sensors],     [$with_libsensors],   [lm_sensors statistics])
  AC_PLUGIN([serial],      [$plugin_serial],     [serial port traffic])
  AC_PLUGIN([sigrok],      [$with_libsigrok],    [sigrok acquisition sources])
@@ -17,7 +15,7 @@ index 6ee6e9a..e1b477a 100644
  AC_PLUGIN([snmp],        [$with_libnetsnmp],   [SNMP querying plugin])
  AC_PLUGIN([statsd],      [yes],                [StatsD plugin])
  AC_PLUGIN([swap],        [$plugin_swap],       [Swap usage statistics])
-@@ -5553,6 +5554,7 @@ Configuration:
+@@ -5553,6 +5554,7 @@
      sensors . . . . . . . $enable_sensors
      serial  . . . . . . . $enable_serial
      sigrok  . . . . . . . $enable_sigrok
@@ -25,11 +23,10 @@ index 6ee6e9a..e1b477a 100644
      snmp  . . . . . . . . $enable_snmp
      statsd  . . . . . . . $enable_statsd
      swap  . . . . . . . . $enable_swap
-diff --git a/src/Makefile.am b/src/Makefile.am
-index df60d0d..076f029 100644
---- a/src/Makefile.am
-+++ b/src/Makefile.am
-@@ -1072,6 +1072,14 @@ sigrok_la_LDFLAGS = $(PLUGIN_LDFLAGS) $(BUILD_WITH_LIBSIGROK_LDFLAGS)
+diff -urNad '--exclude=CVS' '--exclude=.svn' '--exclude=.git' '--exclude=.arch' '--exclude=.hg' '--exclude=_darcs' '--exclude=.bzr' git_edf-hpc_pkg-collectd~/src/Makefile.am git_edf-hpc_pkg-collectd/src/Makefile.am
+--- git_edf-hpc_pkg-collectd~/src/Makefile.am	2018-03-15 14:38:47.000000000 +0100
++++ git_edf-hpc_pkg-collectd/src/Makefile.am	2018-03-15 15:18:52.000000000 +0100
+@@ -1072,6 +1072,14 @@
  collectd_DEPENDENCIES += sigrok.la
  endif
  
@@ -44,10 +41,9 @@ index df60d0d..076f029 100644
  if BUILD_PLUGIN_SNMP
  pkglib_LTLIBRARIES += snmp.la
  snmp_la_SOURCES = snmp.c
-diff --git a/src/collectd.conf.in b/src/collectd.conf.in
-index 1f4ccf8..f466db2 100644
---- a/src/collectd.conf.in
-+++ b/src/collectd.conf.in
+diff -urNad '--exclude=CVS' '--exclude=.svn' '--exclude=.git' '--exclude=.arch' '--exclude=.hg' '--exclude=_darcs' '--exclude=.bzr' git_edf-hpc_pkg-collectd~/src/collectd.conf.in git_edf-hpc_pkg-collectd/src/collectd.conf.in
+--- git_edf-hpc_pkg-collectd~/src/collectd.conf.in	2018-03-15 14:38:47.000000000 +0100
++++ git_edf-hpc_pkg-collectd/src/collectd.conf.in	2018-03-15 15:18:52.000000000 +0100
 @@ -156,6 +156,7 @@
  #@BUILD_PLUGIN_SENSORS_TRUE@LoadPlugin sensors
  #@BUILD_PLUGIN_SERIAL_TRUE@LoadPlugin serial
@@ -68,11 +64,10 @@ index 1f4ccf8..f466db2 100644
  #<Plugin snmp>
  #   <Data "powerplus_voltge_input">
  #       Type "voltage"
-diff --git a/src/collectd.conf.pod b/src/collectd.conf.pod
-index 978c1c5..81c01f1 100644
---- a/src/collectd.conf.pod
-+++ b/src/collectd.conf.pod
-@@ -5260,6 +5260,49 @@ measurements are discarded.
+diff -urNad '--exclude=CVS' '--exclude=.svn' '--exclude=.git' '--exclude=.arch' '--exclude=.hg' '--exclude=_darcs' '--exclude=.bzr' git_edf-hpc_pkg-collectd~/src/collectd.conf.pod git_edf-hpc_pkg-collectd/src/collectd.conf.pod
+--- git_edf-hpc_pkg-collectd~/src/collectd.conf.pod	2018-03-15 14:38:47.000000000 +0100
++++ git_edf-hpc_pkg-collectd/src/collectd.conf.pod	2018-03-15 15:50:14.062347576 +0100
+@@ -5260,6 +5260,72 @@
  
  =back
  
@@ -117,17 +112,38 @@ index 978c1c5..81c01f1 100644
 +nodename used by slurmd, this option permits to give the true nodename to use
 +to the plugin.
 +
++=item B<CollectPSS> B<true>|B<false>
++
++The plugin can collect memory usage per job by summing the PSS (Proportional
++Set Size) of each process associated to the job on the current node. This metric
++is the most precise for memory usage but collecting it incurs a performance
++penalty that might not be neglected. PSS is the sum of all the PSS entries in
++I</proc/PID/smaps> for each process.
++
++When B<false>, the metric is emitted with a value of 0.
++
++Default: B<true>
++
++=item B<CollectRSS> B<true>|B<false>
++
++The plugin can collect memory usage per job by summing the RSS (Resident
++Set Size) of each process associated to the job on the current node. This metric
++can double count some memory usage on shared memory but is the fastest to collect.
++This is the sum of all RSS entries in I</proc/PID/stat> for each process.
++
++When B<false>, the metric is emitted with a value of 0.
++
++Default: B<true>
++
 +=back
 +
  =head2 Plugin C<snmp>
  
  Since the configuration of the C<snmp plugin> is a little more complicated than
-diff --git a/src/slurmd.c b/src/slurmd.c
-new file mode 100644
-index 0000000..305e081
---- /dev/null
-+++ b/src/slurmd.c
-@@ -0,0 +1,1003 @@
+diff -urNad '--exclude=CVS' '--exclude=.svn' '--exclude=.git' '--exclude=.arch' '--exclude=.hg' '--exclude=_darcs' '--exclude=.bzr' git_edf-hpc_pkg-collectd~/src/slurmd.c git_edf-hpc_pkg-collectd/src/slurmd.c
+--- git_edf-hpc_pkg-collectd~/src/slurmd.c	1970-01-01 01:00:00.000000000 +0100
++++ git_edf-hpc_pkg-collectd/src/slurmd.c	2018-03-15 15:18:52.000000000 +0100
+@@ -0,0 +1,1115 @@
 +/**
 + * collectd - src/slurmd.c
 + * Copyright (C) 2015       Rémi Palancher
@@ -165,7 +181,9 @@ index 0000000..305e081
 +{
 +  "CgroupMountPoint",
 +  "IgnoreAbsentCpuset",
-+  "SlurmdNodeName"
++  "SlurmdNodeName",
++  "CollectPSS",
++  "CollectRSS"
 +};
 +
 +static int config_keys_num = STATIC_ARRAY_SIZE (config_keys);
@@ -191,6 +209,18 @@ index 0000000..305e081
 +typedef struct cpu_time_s cpu_time_t;
 +
 +/*
++ * Contains a snapshot view of consumed memory.
++ */
++
++struct memory_s
++{
++  long unsigned int rss;
++  long unsigned int pss;
++};
++
++typedef struct memory_s memory_t;
++
++/*
 + * Contains all informations about a job, with:
 + *   - job number
 + *   - global PSS
@@ -202,7 +232,7 @@ index 0000000..305e081
 +struct job_info_s {
 +  unsigned int job_number;
 +  cpu_time_t *cpu_time;
-+  long unsigned int pss;
++  memory_t *memory;
 +  _Bool updated;
 +  job_info_t *next;
 +};
@@ -213,6 +243,8 @@ index 0000000..305e081
 +static char *cgroup_mnt_pt = NULL;
 +static char *slurmd_node_name = NULL;
 +static _Bool ignore_absent_cpuset = 0;
++static _Bool collect_pss = 1;
++static _Bool collect_rss = 1;
 +/* global vars */
 +static jobs_list_t *jobs = NULL;
 +
@@ -223,7 +255,7 @@ index 0000000..305e081
 +/*
 + * Adds a new job to the global jobs list.
 + */
-+static job_info_t * slurmd_job_add (unsigned int job_number, cpu_time_t *initial_cpu_time)
++static job_info_t * slurmd_job_add (unsigned int job_number, cpu_time_t *initial_cpu_time, memory_t *initial_memory)
 +{
 +  job_info_t *new_job = smalloc(sizeof(job_info_t));
 +  job_info_t *xjob = NULL;
@@ -232,6 +264,7 @@ index 0000000..305e081
 +
 +  new_job->job_number = job_number;
 +  new_job->cpu_time = initial_cpu_time;
++  new_job->memory = initial_memory;
 +
 +  new_job->updated = 1;
 +  new_job->next = NULL;
@@ -257,6 +290,16 @@ index 0000000..305e081
 +  job->cpu_time = new_cpu_time;
 +  job->updated = 1;
 +} /* void slurmd_job_update_cpu_time */
++
++/*
++ * Update the memory of the job with the memory in parameter.
++ */
++static void slurmd_job_update_memory (job_info_t *job, memory_t *new_memory)
++{
++  sfree(job->memory);
++  job->memory = new_memory;
++  job->updated = 1;
++} /* void slurmd_job_update_memory */
 +
 +/*
 + * Finds the job whose number is in parameter out of the global jobs list
@@ -320,7 +363,7 @@ index 0000000..305e081
 +      /* jump to next job */
 +      cur_job = next_job;
 +    }
-+    next_job = next_job->next;
++    next_job = cur_job->next;
 +  }
 +} /* void slurmd_jobs_remove_outdated */
 +
@@ -367,7 +410,10 @@ index 0000000..305e081
 +
 +    /* PSS is in kBytes, submit in Bytes */
 +    slurmd_submit_gauge(xjob->job_number, "memory", "pss",
-+                        (gauge_t) (xjob->pss * 1024));
++                        (gauge_t) (xjob->memory->pss * 1024));
++    /* RSS already in Bytes */
++    slurmd_submit_gauge(xjob->job_number, "memory", "rss",
++                        (gauge_t) xjob->memory->rss);
 +    slurmd_submit_derive(xjob->job_number, "cpu", "user",
 +                         (derive_t) xjob->cpu_time->user);
 +    slurmd_submit_derive(xjob->job_number, "cpu", "nice",
@@ -541,9 +587,47 @@ index 0000000..305e081
 +  }
 +
 +  fclose(smaps_fh);
-+  DEBUG("slurmd plugin: total %lu kB for PID %i", pss, pid);
++  DEBUG("slurmd plugin: total PSS %lu kB for PID %i", pss, pid);
 +  return pss;
 +} /* int slurmd_get_pid_pss */
++
++/*
++ * VmRSS from /proc/<pid>/stat for the PID given in parameter.
++ *
++ * Returns the value of RSS of the PID or -1 on error.
++ */
++static unsigned int slurmd_get_pid_rss (const pid_t pid)
++{
++  char stat_fpath[PATH_MAX];
++  char buf[1024];
++  FILE *stat_fh;
++  int nb_matches;
++  long int rss_pages = 0;
++  long unsigned int rss = 0;
++
++  /* build stat fpath */
++  bzero(stat_fpath, sizeof(stat_fpath));
++  ssnprintf(stat_fpath, sizeof(stat_fpath), "/proc/%d/stat", pid);
++
++  stat_fh = fopen(stat_fpath, "r");
++
++  if (stat_fh == NULL) {
++    char errbuf[1024];
++    WARNING("slurmd plugin: fopen() error on stat file %s: %s", stat_fpath, sstrerror (errno, errbuf, sizeof (errbuf)));
++    return (-1);
++  }
++
++  /* Read all lines to make the sum of all Pss */
++  if (fgets(buf, sizeof(buf), stat_fh)) {
++    nb_matches = sscanf(buf, "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %*u %*u %*d %*d %*d %*d %*d %*d %*u %*u %ld ", &rss_pages);
++    if (nb_matches == 1)
++      rss = rss_pages * getpagesize();
++  }
++
++  fclose(stat_fh);
++  DEBUG("slurmd plugin: total RSS %lu kB for PID %i", rss, pid);
++  return rss;
++} /* int slurmd_get_pid_rss */
 +
 +/*
 + * Parses /proc/stat file calculature the sum of cpu time of all cpus
@@ -703,17 +787,17 @@ index 0000000..305e081
 +
 +/*
 + * Parses the PIDs found in the cpuset cgroup tasks file whose path is given
-+ * in parameter and compute the sum of PSS of all these PIDs (excepting
++ * in parameter and compute the memory usage of all these PIDs (excepting
 + * threads).
 + *
-+ * Returns the sum of PSS of the PIDs found in the tasks file or -1 on error.
++ * Returns 0 on success or -1 on error.
 + */
-+static int slurmd_get_tasks_pss (const char *tasks_fpath)
++static int slurmd_get_tasks_memory (const char *tasks_fpath, memory_t* result)
 +{
 +  int idx = 0;
 +  int nb_pids = -1;
 +  int nb_threads = -1;
-+  unsigned int pss = 0, xpss = 0;
++  long unsigned int xpss, xrss;
 +
 +  pid_t pids[MAX_PIDS];
 +  /* used to track threads and exclude them from memory accounting */
@@ -732,29 +816,46 @@ index 0000000..305e081
 +  for(idx = 0 ; idx<nb_pids ; idx++) {
 +    /* Exclude threads */
 +    if (!slurmd_pid_is_thread(pids[idx], threads, nb_threads)) {
-+      xpss = slurmd_get_pid_pss(pids[idx]);
-+      if (xpss < 0)
-+        return (-1);
-+      else
-+        pss += xpss;
++      if (collect_pss) {
++        xpss = slurmd_get_pid_pss(pids[idx]);
++        if (xpss < 0)
++          return (-1);
++        else
++          result->pss += xpss;
++      }
++      else {
++        result->pss = 0;
++      }
++
++      if (collect_rss) {
++        xrss = slurmd_get_pid_rss(pids[idx]);
++        if (xrss < 0)
++          return (-1);
++        else
++          result->rss += xrss;
++      }
++      else {
++        result->rss = 0;
++      }
 +    }
 +  }
 +
-+  return pss;
-+} /* int slurmd_get_tasks_pss */
++  return 0;
++} /* int slurmd_get_tasks_memory */
 +
 +/*
 + * Browse a Slurm job step specific cgroup whose path is given in parameter
 + * to find the tasks file and get the sum of all theses tasks PSS.
 + *
-+ * Returns the total PSS consumed by the job step tasks or -1 on error
++ * Returns 0 on success or -1 on error
 + */
-+static int slurmd_get_jobstep_pss (const char *step_cpuset_mnt_pt)
++static int slurmd_get_jobstep_memory (const char *step_cpuset_mnt_pt, memory_t *result)
 +{
 +  char tasks_fpath[PATH_MAX];
 +  DIR *dir;
 +  struct dirent dir_ent_buf, *dir_ent;
-+  unsigned int pss = 0, xpss = 0;
++  memory_t * xresult=NULL;
++  int status = -1;
 +
 +  dir = opendir(step_cpuset_mnt_pt);
 +  if (dir == NULL) {
@@ -762,6 +863,7 @@ index 0000000..305e081
 +    return (-1);
 +  }
 +
++  xresult = smalloc(sizeof(memory_t));
 +  while(1) {
 +    if (readdir_r(dir, &dir_ent_buf, &dir_ent) != 0) {
 +      WARNING("slurmd plugin: problem during readdir_r() %s", step_cpuset_mnt_pt);
@@ -775,19 +877,23 @@ index 0000000..305e081
 +    if (strncmp(dir_ent->d_name, "tasks", 6) == 0) {
 +      ssnprintf(tasks_fpath, sizeof(tasks_fpath), "%s/%s",
 +                step_cpuset_mnt_pt, dir_ent->d_name);
-+      xpss = slurmd_get_tasks_pss(tasks_fpath);
-+      if (xpss < 0) {
++      xresult->rss = 0;
++      xresult->pss = 0;
++      status = slurmd_get_tasks_memory(tasks_fpath, xresult);
++      if (status < 0) {
 +        closedir(dir);
 +        return -1;
 +      }
-+      else
-+        pss += xpss;
++      else {
++        result->pss += xresult->pss;
++        result->rss += xresult->rss;
++      }
 +    }
 +  }
 +  closedir(dir);
 +
-+  return pss;
-+} /* int slurmd_get_jobstep_pss */
++  return 0;
++} /* int slurmd_get_jobstep_memory */
 +
 +/*
 + * Parses cpuset cpuset.cpus file of the cpuset cgroup whose path is given in
@@ -889,10 +995,10 @@ index 0000000..305e081
 +  int job_cpus[MAX_JOB_CPUS];
 +  int job_nb_cpus = 0;
 +  int ret = 0;
++  int status = -1;
 +  cpu_time_t *cpu_time = NULL;
++  memory_t *memory = NULL, *xmemory = NULL;
 +  job_info_t *my_job;
-+  unsigned int job_pss = 0;
-+  int xpss = 0;
 +
 +  /*
 +   * Get job's allocated CPUs
@@ -901,6 +1007,13 @@ index 0000000..305e081
 +
 +  if(job_nb_cpus < 0)
 +    return (-1);
++
++  /*
++   * Initial memory info
++   */
++  memory = smalloc(sizeof(memory_t));
++  memory->pss = 0;
++  memory->rss = 0;
 +
 +  /*
 +   * Get job's allocated CPUs usage
@@ -912,11 +1025,13 @@ index 0000000..305e081
 +    return (-1);
 +
 +  my_job = slurmd_job_find(job_number);
-+  if (my_job == NULL)
-+    my_job = slurmd_job_add(job_number, cpu_time);
-+  else
++  if (my_job == NULL) {
++    my_job = slurmd_job_add(job_number, cpu_time, memory);
++  }
++  else {
 +    slurmd_job_update_cpu_time(my_job, cpu_time);
-+
++    slurmd_job_update_memory(my_job, memory);
++  }
 +  /*
 +   * Get all steps tasks usage
 +   */
@@ -928,6 +1043,7 @@ index 0000000..305e081
 +
 +  ret = 0;
 +
++  xmemory = smalloc(sizeof(memory_t));
 +  while(1) {
 +    if (readdir_r(dir, &dir_ent_buf, &dir_ent) != 0) {
 +      WARNING("slurmd plugin: problem during readdir_r() %s", job_cpuset_mnt_pt);
@@ -940,15 +1056,17 @@ index 0000000..305e081
 +    if (strncmp(dir_ent->d_name, "step_", 5) == 0) {
 +        ssnprintf(step_cpuset_mnt_pt, sizeof(step_cpuset_mnt_pt), "%s/%s",
 +                  job_cpuset_mnt_pt, dir_ent->d_name);
-+        xpss = slurmd_get_jobstep_pss(step_cpuset_mnt_pt);
-+        if(xpss < 0)
++        xmemory->pss = 0;
++        xmemory->rss = 0;
++        status = slurmd_get_jobstep_memory(step_cpuset_mnt_pt, xmemory);
++        if(status < 0)
 +          ret = -1;
 +        else
-+          job_pss += (unsigned int) xpss;
++          memory->pss += xmemory->pss;
++          memory->rss += xmemory->rss;
 +    }
 +  }
 +  closedir(dir);
-+  my_job->pss = job_pss;
 +
 +  return ret;
 +} /* int slurmd_browse_job_cpuset */
@@ -1121,6 +1239,16 @@ index 0000000..305e081
 +    if (slurmd_node_name != NULL)
 +      sfree(slurmd_node_name);
 +    slurmd_node_name = strdup(value);
++  } else if (0 == strcasecmp (key, "CollectPSS")) {
++    if (IS_FALSE (value))
++      collect_pss = 0;
++    else
++      collect_pss = 1;
++  } else if (0 == strcasecmp (key, "CollectRSS")) {
++    if (IS_FALSE (value))
++      collect_rss = 0;
++    else
++      collect_rss = 1;
 +  } else
 +    return (-1);
 +  return (0);
