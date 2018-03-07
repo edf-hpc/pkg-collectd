@@ -1,3 +1,9 @@
+collectd (5.4.1-6+deb8u1calibre9+1) calibre9; urgency=medium
+
+  * slurmd: Optional RSS or PSS memory collection
+
+ -- Thomas HAMEL <thomas-externe.hamel@edf.fr>  Wed, 07 Mar 2018 17:01:27 +0100
+
 collectd (5.4.1-6+deb8u1) jessie-security; urgency=high
 
   * debian/patches/CVE-2016-6254.dpatch: Fix heap overflow in the network
