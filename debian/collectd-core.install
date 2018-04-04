@@ -1,6 +1,7 @@
 ../../contrib/migrate-3-4.px usr/lib/collectd/utils
 ../../contrib/migrate-4-5.px usr/lib/collectd/utils
 ../../contrib/rrd_filter.px usr/lib/collectd/utils
+../../contrib/exec-cuda.sh usr/lib/collectd/utils
 ../collection.conf etc/collectd/
 usr/lib/collectd/*.so
 usr/sbin
