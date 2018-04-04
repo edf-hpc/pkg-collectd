@@ -36,6 +36,7 @@ case "$1" in
             mkdir /var/lib/collectd/
             mv $tmpdir /var/lib/collectd/rrd
             chmod 0755 /var/lib/collectd/rrd
+            chmod 0755 /usr/lib/collectd/utils/exec-cuda.sh
 
             # this is only available on Solaris using libkstat
             rm -f /var/lib/collectd/rrd/$hostname/swap/swap-reserved.rrd

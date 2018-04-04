@@ -1,3 +1,9 @@
+collectd (5.4.1-6+deb8u1calibre9+4) calibre9; urgency=medium
+
+  * add exec right in post install for /usr/lib/collectd/utils/exec-cuda.sh
+
+ -- Nicolas Meaux <nicolas-externe.meaux@edf.fr>  Wed, 04 Apr 2018 15:57:02 +0200
+
 collectd (5.4.1-6+deb8u1calibre9+3) calibre9; urgency=medium
 
   * install contrib/exec-cuda.sh into /usr/lib/collectd/utils
