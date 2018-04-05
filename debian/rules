@@ -391,3 +391,6 @@ binary-arch: build install-arch
 binary: binary-arch binary-indep
 .PHONY: build build-arch build-indep clean binary-indep binary-arch binary install-indep install-arch
 
+override_dh_fixperms:
+	dh_fixperms
+	chmod 0755 /usr/lib/collectd/utils/exec-cuda.sh
