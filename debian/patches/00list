@@ -19,3 +19,4 @@ slurmctld-plugin.dpatch
 delay-first-read.dpatch
 fix-version-gen.dpatch
 add_types_count.dpatch
+exec-cuda-script

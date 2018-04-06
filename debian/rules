@@ -358,7 +358,6 @@ binary-arch: build install-arch
 		contrib/collectd_network.py contrib/collectd_unixsock.py \
 		contrib/snmp-probe-host.px contrib/GenericJMX.conf \
 		contrib/postgresql \
-                contrib/exec-cuda.sh \
 		debian/collectd.conf debian/filters.conf debian/thresholds.conf
 	# some upstream tarballs have been built inside a dirty working dir
 	( cd debian/collectd-core/ \
@@ -390,7 +389,3 @@ binary-arch: build install-arch
 
 binary: binary-arch binary-indep
 .PHONY: build build-arch build-indep clean binary-indep binary-arch binary install-indep install-arch
-
-override_dh_fixperms:
-	dh_fixperms
-	chmod 0755 /usr/lib/collectd/utils/exec-cuda.sh

@@ -1,3 +1,9 @@
+collectd (5.4.1-6+deb8u1calibre9+6) calibre9; urgency=medium
+
+  * fix debian way with patch system for exec-cuda.sh 
+
+ -- Nicolas Meaux <nicolas-externe.meaux@edf.fr>  Fri, 06 Apr 2018 15:12:39 +0200
+
 collectd (5.4.1-6+deb8u1calibre9+5) calibre9; urgency=medium
 
   * fix right issue on /usr/lib/collectd/utils/exec-cuda.sh 
